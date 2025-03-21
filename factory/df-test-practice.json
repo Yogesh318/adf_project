@@ -1,0 +1,9 @@
+{
+	"name": "df-test-practice",
+	"location": "eastus",
+	"identity": {
+		"type": "SystemAssigned",
+		"principalId": "cd6bcebe-9ed4-4b9f-a6d3-b92a5a87ce63",
+		"tenantId": "c40a7936-f8a1-43cb-ba49-241504618c54"
+	}
+}
