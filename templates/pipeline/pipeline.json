@@ -1,0 +1,633 @@
+{
+	"name": "pl_load_ods_to_elt_stage_sp",
+	"properties": {
+		"activities": [
+			{
+				"name": "scd_1_sp",
+				"type": "SqlServerStoredProcedure",
+				"dependsOn": [
+					{
+						"activity": "log_running_status",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 3,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"storedProcedureName": {
+						"value": "@pipeline().parameters.storedproc_name",
+						"type": "Expression"
+					},
+					"storedProcedureParameters": {
+						"activity_name": {
+							"value": "calling_scd1_sp",
+							"type": "String"
+						},
+						"customer_name": {
+							"value": {
+								"value": "@pipeline().parameters.customer",
+								"type": "Expression"
+							},
+							"type": "String"
+						},
+						"driver_table": {
+							"value": {
+								"value": "@pipeline().parameters.driver_table",
+								"type": "Expression"
+							},
+							"type": "String"
+						},
+						"incr_date": {
+							"value": {
+								"value": "@pipeline().parameters.incr_date",
+								"type": "Expression"
+							},
+							"type": "String"
+						},
+						"pl_name": {
+							"value": {
+								"value": "@pipeline().Pipeline",
+								"type": "Expression"
+							},
+							"type": "String"
+						},
+						"source_schema": {
+							"value": {
+								"value": "@pipeline().parameters.src_schema",
+								"type": "Expression"
+							},
+							"type": "String"
+						},
+						"source_table_name": {
+							"value": {
+								"value": "@pipeline().parameters.src_tablename",
+								"type": "Expression"
+							},
+							"type": "String"
+						},
+						"subject_area": {
+							"value": {
+								"value": "@pipeline().parameters.subject_area",
+								"type": "Expression"
+							},
+							"type": "String"
+						},
+						"target_schema": {
+							"value": {
+								"value": "@pipeline().parameters.tgt_schema",
+								"type": "Expression"
+							},
+							"type": "String"
+						},
+						"target_table_name": {
+							"value": {
+								"value": "@pipeline().parameters.tgt_tablename",
+								"type": "Expression"
+							},
+							"type": "String"
+						},
+						"watermarktable": {
+							"value": {
+								"value": "@pipeline().parameters.pipeline_log_table",
+								"type": "Expression"
+							},
+							"type": "String"
+						},
+						"delete_command": {
+							"value": {
+								"value": "@replace(replace(replace(replace(replace(pipeline().parameters.sql_commond,'tgt_schema', pipeline().parameters.tgt_schema),'tgt_tablename', pipeline().parameters.tgt_tablename),'src_schema', pipeline().parameters.src_schema),'src_tablename', pipeline().parameters.src_tablename),'seed',pipeline().parameters.customer)",
+								"type": "Expression"
+							},
+							"type": "String"
+						},
+						"pl_runid": {
+							"value": {
+								"value": "@pipeline().parameters.pl_runid",
+								"type": "Expression"
+							},
+							"type": "String"
+						},
+						"incr_buffer": {
+							"value": {
+								"value": "@pipeline().parameters.incr_buffer",
+								"type": "Expression"
+							},
+							"type": "String"
+						}
+					}
+				},
+				"linkedServiceName": {
+					"referenceName": "AzureSynapseAnalytics1",
+					"type": "LinkedServiceReference"
+				}
+			},
+			{
+				"name": "log_running_status",
+				"description": "will update the pipeline_run_status table with running status for pipeline",
+				"type": "SqlServerStoredProcedure",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"storedProcedureName": {
+						"value": "@pipeline().parameters.log_sp_name",
+						"type": "Expression"
+					},
+					"storedProcedureParameters": {
+						"activity_name": {
+							"value": "log_running",
+							"type": "String"
+						},
+						"business_area": {
+							"value": {
+								"value": "@pipeline().parameters.business_area",
+								"type": "Expression"
+							},
+							"type": "String"
+						},
+						"customer_name": {
+							"value": {
+								"value": "@pipeline().parameters.customer",
+								"type": "Expression"
+							},
+							"type": "String"
+						},
+						"endtime": {
+							"value": {
+								"value": "@convertTimeZone(utcNow(),'UTC','Pacific Standard Time')",
+								"type": "Expression"
+							},
+							"type": "String"
+						},
+						"errormessage": {
+							"value": "",
+							"type": "String"
+						},
+						"max_aud_dt": {
+							"value": "",
+							"type": "String"
+						},
+						"pipeline_log_table": {
+							"value": {
+								"value": "@pipeline().parameters.pipeline_log_table",
+								"type": "Expression"
+							},
+							"type": "String"
+						},
+						"pl_name": {
+							"value": {
+								"value": "@pipeline().Pipeline",
+								"type": "Expression"
+							},
+							"type": "String"
+						},
+						"pl_runid": {
+							"value": {
+								"value": "@pipeline().parameters.pl_runid",
+								"type": "Expression"
+							},
+							"type": "String"
+						},
+						"pl_trigger_name": {
+							"value": {
+								"value": "@pipeline().TriggerName",
+								"type": "Expression"
+							},
+							"type": "String"
+						},
+						"pl_triggertime": {
+							"value": {
+								"value": "@convertTimeZone(pipeline().TriggerTime,'UTC','Pacific Standard Time')",
+								"type": "Expression"
+							},
+							"type": "String"
+						},
+						"pl_triggertype": {
+							"value": {
+								"value": "@pipeline().TriggerType",
+								"type": "Expression"
+							},
+							"type": "String"
+						},
+						"starttime": {
+							"value": {
+								"value": "@convertTimeZone(pipeline().TriggerTime,'UTC','Pacific Standard Time')",
+								"type": "Expression"
+							},
+							"type": "String"
+						},
+						"status": {
+							"value": "running",
+							"type": "String"
+						},
+						"target_table_name": {
+							"value": {
+								"value": "@pipeline().parameters.tgt_tablename",
+								"type": "Expression"
+							},
+							"type": "String"
+						},
+						"rowsread": {
+							"value": "",
+							"type": "String"
+						},
+						"rowswritten": {
+							"value": "",
+							"type": "String"
+						},
+						"badrecordscount": {
+							"value": "",
+							"type": "String"
+						}
+					}
+				},
+				"linkedServiceName": {
+					"referenceName": "AzureSynapseAnalytics1",
+					"type": "LinkedServiceReference"
+				}
+			},
+			{
+				"name": "log_success_on_update",
+				"type": "SqlServerStoredProcedure",
+				"dependsOn": [
+					{
+						"activity": "scd_1_sp",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"storedProcedureName": {
+						"value": "@pipeline().parameters.log_sp_name",
+						"type": "Expression"
+					},
+					"storedProcedureParameters": {
+						"activity_name": {
+							"value": "scd_1_sp",
+							"type": "String"
+						},
+						"business_area": {
+							"value": {
+								"value": "@pipeline().parameters.business_area",
+								"type": "Expression"
+							},
+							"type": "String"
+						},
+						"customer_name": {
+							"value": {
+								"value": "@pipeline().parameters.customer",
+								"type": "Expression"
+							},
+							"type": "String"
+						},
+						"endtime": {
+							"value": {
+								"value": "@convertTimeZone(utcNow(),'UTC','Pacific Standard Time')",
+								"type": "Expression"
+							},
+							"type": "String"
+						},
+						"errormessage": {
+							"value": "",
+							"type": "String"
+						},
+						"max_aud_dt": {
+							"value": "",
+							"type": "String"
+						},
+						"pipeline_log_table": {
+							"value": {
+								"value": "@pipeline().parameters.pipeline_log_table",
+								"type": "Expression"
+							},
+							"type": "String"
+						},
+						"pl_name": {
+							"value": {
+								"value": "@pipeline().Pipeline",
+								"type": "Expression"
+							},
+							"type": "String"
+						},
+						"pl_runid": {
+							"value": {
+								"value": "@pipeline().parameters.pl_runid",
+								"type": "Expression"
+							},
+							"type": "String"
+						},
+						"pl_trigger_name": {
+							"value": {
+								"value": "@pipeline().TriggerName",
+								"type": "Expression"
+							},
+							"type": "String"
+						},
+						"pl_triggertime": {
+							"value": {
+								"value": "@convertTimeZone(pipeline().TriggerTime,'UTC','Pacific Standard Time')",
+								"type": "Expression"
+							},
+							"type": "String"
+						},
+						"pl_triggertype": {
+							"value": {
+								"value": "@pipeline().TriggerType",
+								"type": "Expression"
+							},
+							"type": "String"
+						},
+						"starttime": {
+							"value": {
+								"value": "@convertTimeZone(pipeline().TriggerTime,'UTC','Pacific Standard Time')",
+								"type": "Expression"
+							},
+							"type": "String"
+						},
+						"status": {
+							"value": "success",
+							"type": "String"
+						},
+						"target_table_name": {
+							"value": {
+								"value": "@pipeline().parameters.tgt_tablename",
+								"type": "Expression"
+							},
+							"type": "String"
+						},
+						"rowsread": {
+							"value": "0",
+							"type": "String"
+						},
+						"rowswritten": {
+							"value": "0",
+							"type": "String"
+						},
+						"badrecordscount": {
+							"value": "",
+							"type": "String"
+						}
+					}
+				},
+				"linkedServiceName": {
+					"referenceName": "AzureSynapseAnalytics1",
+					"type": "LinkedServiceReference"
+				}
+			},
+			{
+				"name": "log_fail_on_update",
+				"type": "SqlServerStoredProcedure",
+				"dependsOn": [
+					{
+						"activity": "scd_1_sp",
+						"dependencyConditions": [
+							"Failed"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"storedProcedureName": {
+						"value": "@pipeline().parameters.log_sp_name",
+						"type": "Expression"
+					},
+					"storedProcedureParameters": {
+						"activity_name": {
+							"value": "scd_1_sp",
+							"type": "String"
+						},
+						"business_area": {
+							"value": {
+								"value": "@pipeline().parameters.business_area",
+								"type": "Expression"
+							},
+							"type": "String"
+						},
+						"customer_name": {
+							"value": {
+								"value": "@pipeline().parameters.customer",
+								"type": "Expression"
+							},
+							"type": "String"
+						},
+						"endtime": {
+							"value": {
+								"value": "@convertTimeZone(utcNow(),'UTC','Pacific Standard Time')",
+								"type": "Expression"
+							},
+							"type": "String"
+						},
+						"errormessage": {
+							"value": {
+								"value": "@replace(replace(activity('scd_1_sp').error.message ,',','|'),'''','\"')",
+								"type": "Expression"
+							},
+							"type": "String"
+						},
+						"max_aud_dt": {
+							"value": "",
+							"type": "String"
+						},
+						"pipeline_log_table": {
+							"value": {
+								"value": "@pipeline().parameters.pipeline_log_table",
+								"type": "Expression"
+							},
+							"type": "String"
+						},
+						"pl_name": {
+							"value": {
+								"value": "@pipeline().Pipeline",
+								"type": "Expression"
+							},
+							"type": "String"
+						},
+						"pl_runid": {
+							"value": {
+								"value": "@pipeline().parameters.pl_runid",
+								"type": "Expression"
+							},
+							"type": "String"
+						},
+						"pl_trigger_name": {
+							"value": {
+								"value": "@pipeline().TriggerName",
+								"type": "Expression"
+							},
+							"type": "String"
+						},
+						"pl_triggertime": {
+							"value": {
+								"value": "@convertTimeZone(pipeline().TriggerTime,'UTC','Pacific Standard Time')",
+								"type": "Expression"
+							},
+							"type": "String"
+						},
+						"pl_triggertype": {
+							"value": {
+								"value": "@pipeline().TriggerType",
+								"type": "Expression"
+							},
+							"type": "String"
+						},
+						"starttime": {
+							"value": {
+								"value": "@convertTimeZone(pipeline().TriggerTime,'UTC','Pacific Standard Time')",
+								"type": "Expression"
+							},
+							"type": "String"
+						},
+						"status": {
+							"value": "failed",
+							"type": "String"
+						},
+						"target_table_name": {
+							"value": {
+								"value": "@pipeline().parameters.tgt_tablename",
+								"type": "Expression"
+							},
+							"type": "String"
+						},
+						"rowsread": {
+							"value": "",
+							"type": "String"
+						},
+						"rowswritten": {
+							"value": "",
+							"type": "String"
+						},
+						"badrecordscount": {
+							"value": "",
+							"type": "String"
+						}
+					}
+				},
+				"linkedServiceName": {
+					"referenceName": "AzureSynapseAnalytics1",
+					"type": "LinkedServiceReference"
+				}
+			}
+		],
+		"parameters": {
+			"src_schema": {
+				"type": "String",
+				"defaultValue": "acme_elt"
+			},
+			"src_tablename": {
+				"type": "String",
+				"defaultValue": "dim_error_code_src_v"
+			},
+			"tgt_tablename": {
+				"type": "String",
+				"defaultValue": "dim_error_code"
+			},
+			"customer": {
+				"type": "string",
+				"defaultValue": "acme"
+			},
+			"tgt_schema": {
+				"type": "string",
+				"defaultValue": "acme_lwh"
+			},
+			"stage_path": {
+				"type": "String",
+				"defaultValue": "acme"
+			},
+			"VALID_TRHU_DT": {
+				"type": "string",
+				"defaultValue": "2100-12-31 00:00:00"
+			},
+			"VALID_FROM_DT": {
+				"type": "string",
+				"defaultValue": "1900-01-01 00:00:00"
+			},
+			"sql_commond": {
+				"type": "string",
+				"defaultValue": "1=1"
+			},
+			"log_sp_name": {
+				"type": "String",
+				"defaultValue": "sp_pipelinerun_status"
+			},
+			"subject_area": {
+				"type": "String"
+			},
+			"watermarktable": {
+				"type": "String"
+			},
+			"incr_date": {
+				"type": "String"
+			},
+			"driver_table": {
+				"type": "String"
+			},
+			"storedproc_name": {
+				"type": "string"
+			},
+			"pipeline_log_table": {
+				"type": "String"
+			},
+			"business_area": {
+				"type": "String",
+				"defaultValue": "rpm"
+			},
+			"incr_buffer": {
+				"type": "string",
+				"defaultValue": "-15"
+			},
+			"pl_runid": {
+				"type": "string"
+			},
+			"pl_name": {
+				"type": "string"
+			}
+		},
+		"variables": {
+			"pl_start_time": {
+				"type": "String"
+			},
+			"startime": {
+				"type": "String"
+			},
+			"delete_sql_command": {
+				"type": "String"
+			}
+		},
+		"folder": {
+			"name": "azure_data_platform"
+		},
+		"annotations": [],
+		"lastPublishTime": "2024-12-23T19:34:46Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}
